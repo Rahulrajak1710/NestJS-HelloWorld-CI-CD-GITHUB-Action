@@ -45,12 +45,15 @@ jobs:
         run: docker push rahulrajak/nestjs-hello-world:latest
 
       - name: Deploy to server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          ssh -i <(echo "$SSH_PRIVATE_KEY") -o StrictHostKeyChecking=no ubuntu@172.31.46.22 172.17.0.1 << 'EOF'
-            docker pull rahulrajak/nestjs-hello-world:latest
-            docker stop nestjs-hello-world || true
-            docker rm nestjs-hello-world || true
-            docker run -d -p 3000:3000 --name nestjs-hello-world rahulrajak/nestjs-hello-world:latest
+        # env:
+        #   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        # run: |
+        #   ssh -i <(echo "$SSH_PRIVATE_KEY") -o StrictHostKeyChecking=no ubuntu@172.31.46.22 172.17.0.1 << 'EOF'
+        run: docker pull rahulrajak/nestjs-hello-world:latest
+      - name : stop
+        run: docker stop nestjs-hello-world || true
+      - name : rm
+        run: docker rm nestjs-hello-world || true
+      - name : run
+        run: docker run -d -p 3000:3000 --name nestjs-hello-world rahulrajak/nestjs-hello-world:latest
           EOF
