@@ -52,5 +52,5 @@ jobs:
             docker pull rahulrajak/nestjs-hello-world:latest
             docker stop nestjs-hello-world || true
             docker rm nestjs-hello-world || true
-            docker run -d -p 80:3000 --name nestjs-hello-world your-dockerhub-username/nestjs-hello-world:latest
+            docker run -d -p 3000:3000 --name nestjs-hello-world rahulrajak/nestjs-hello-world:latest
           EOF
