@@ -2,8 +2,6 @@ name: CD Pipeline
 
 on:
   workflow_run:
-    types:
-      - completed
 
 jobs:
   deploy:
