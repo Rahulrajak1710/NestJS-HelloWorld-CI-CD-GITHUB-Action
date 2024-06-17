@@ -2,17 +2,26 @@ name: CD Pipeline
 
 on:
   workflow_run:
+    workflows: ["Build and Test Pipeline"]  # The workflow(s) that should trigger this
+    types:
+      - completed
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted  # Assumes a self-hosted runner is set up
 
     steps:
       - name: Pull Docker image
-        run: sudo docker pull rahulrajak/cicd-pipeline:latest
-
-      - name: Delete Old Docker container
-        run: sudo docker rm -f cicd-pipeline-container || true
-
+        run: |
+          echo "Pulling the latest Docker image..."
+          sudo docker pull rahulrajak/cicd-pipeline:latest
+          
+      - name: Delete old Docker container
+        run: |
+          echo "Removing old Docker container if it exists..."
+          sudo docker rm -f cicd-pipeline-container || true
+          
       - name: Run Docker container
-        run: sudo docker run -d -p 3000:3000 --name cicd-pipeline-container rahulrajak/cicd-pipeline:latest
+        run: |
+          echo "Starting new Docker container..."
+          sudo docker run -d -p 3000:3000 --name cicd-pipeline-container rahulrajak/cicd-pipeline:latest
