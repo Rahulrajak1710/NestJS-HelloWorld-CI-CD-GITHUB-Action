@@ -48,7 +48,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          ssh -i <(echo "$SSH_PRIVATE_KEY") -o StrictHostKeyChecking=no ubuntu@18.191.248.129 << 'EOF'
+          ssh -i <(echo "$SSH_PRIVATE_KEY") -o StrictHostKeyChecking=no ubuntu@172.31.46.22 << 'EOF'
             docker pull rahulrajak/nestjs-hello-world:latest
             docker stop nestjs-hello-world || true
             docker rm nestjs-hello-world || true
