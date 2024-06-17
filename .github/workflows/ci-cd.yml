@@ -1,0 +1,56 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the app
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      - name: Docker build
+        run: docker build -t nestjs-hello-world .
+
+      - name: Docker login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+      - name: Docker tag
+        run: docker tag nestjs-hello-world:latest rahulrajak/nestjs-hello-world:latest
+      - name: Docker push
+        run: docker push rahulrajak/nestjs-hello-world:latest
+
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          ssh -i <(echo "$SSH_PRIVATE_KEY") -o StrictHostKeyChecking=no user@your-server-ip << 'EOF'
+            docker pull your-dockerhub-username/nestjs-hello-world:latest
+            docker stop nestjs-hello-world || true
+            docker rm nestjs-hello-world || true
+            docker run -d -p 80:3000 --name nestjs-hello-world your-dockerhub-username/nestjs-hello-world:latest
+          EOF
